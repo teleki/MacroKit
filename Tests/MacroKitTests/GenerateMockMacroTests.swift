@@ -1,7 +1,8 @@
+import MacroKitMacros
+import MacroTesting
 import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
 import XCTest
-import MacroKitMacros
 
 private let testMacros: [String: Macro.Type] = [
     "GenerateMock": GenerateMockMacro.self,
@@ -10,7 +11,14 @@ private let testMacros: [String: Macro.Type] = [
 // edges cases:
 //  - overloaded functions
 
-final class GenerateMockMacroTests: XCTestCase {
+class GenerateMockMacroTests: XCTestCase {
+
+    override func invokeTest() {
+        withMacroTesting(macros: [GenerateMockMacro.self]) {
+            super.invokeTest()
+        }
+    }
+
     func testGenerateMock_HappyPath_SimpleProperty() {
         let proto = """
         protocol TestProtocol {
@@ -19,14 +27,18 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                var property: String {
+                    get
+                }
+            }
 
             #if DEBUG
 
@@ -48,9 +60,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_ThrowingProperty() {
         let proto = """
@@ -60,14 +71,18 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                var property: String {
+                    get throws
+                }
+            }
 
             #if DEBUG
 
@@ -86,9 +101,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_AsyncProperty() {
         let proto = """
@@ -98,14 +112,18 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                var property: String {
+                    get async
+                }
+            }
 
             #if DEBUG
 
@@ -124,9 +142,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_AsyncThrowingProperty() {
         let proto = """
@@ -136,14 +153,18 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                var property: String {
+                    get async throws
+                }
+            }
 
             #if DEBUG
 
@@ -162,9 +183,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_SimpleProperty_GetSet() {
         let proto = """
@@ -175,14 +195,19 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                var property: String {
+                    get
+                    set
+                }
+            }
 
             #if DEBUG
 
@@ -204,9 +229,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
 
     func testGenerateMock_HappyPath_ClosureProperty_Void() {
@@ -217,14 +241,18 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                var property: () -> Void {
+                    get
+                }
+            }
 
             #if DEBUG
 
@@ -246,9 +274,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_ClosureProperty_OneParam() {
         let proto = """
@@ -258,14 +285,18 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                var property: (Int) -> Void {
+                    get
+                }
+            }
 
             #if DEBUG
 
@@ -287,9 +318,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_ClosureProperty_TwoParam() {
         let proto = """
@@ -299,14 +329,18 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                var property: (Int, Bool) -> Void {
+                    get
+                }
+            }
 
             #if DEBUG
 
@@ -328,9 +362,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
 
     func testGenerateMock_HappyPath_ThrowingClosureProperty_TwoParam() {
@@ -341,14 +374,18 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                var property: (Int, Bool) throws -> Void {
+                    get
+                }
+            }
 
             #if DEBUG
 
@@ -370,9 +407,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_ThrowingAsyncClosureProperty_TwoParam() {
         let proto = """
@@ -382,14 +418,18 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                var property: (Int, Bool) async throws -> Void {
+                    get
+                }
+            }
 
             #if DEBUG
 
@@ -411,9 +451,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
 
     func testGenerateMock_HappyPath_ImplicitVoidFunction() {
@@ -422,14 +461,16 @@ final class GenerateMockMacroTests: XCTestCase {
             func function()
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                func function()
+            }
 
             #if DEBUG
 
@@ -446,9 +487,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_ExplicitVoidFunction() {
         let proto = """
@@ -456,14 +496,16 @@ final class GenerateMockMacroTests: XCTestCase {
             func function() -> Void
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                func function() -> Void
+            }
 
             #if DEBUG
 
@@ -480,9 +522,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_ImplicitVoidFunction_WithParam() {
         let proto = """
@@ -490,14 +531,16 @@ final class GenerateMockMacroTests: XCTestCase {
             func function(value: Int)
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                func function(value: Int)
+            }
 
             #if DEBUG
 
@@ -514,9 +557,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_ExplicitVoidFunction_WithParam() {
         let proto = """
@@ -524,14 +566,16 @@ final class GenerateMockMacroTests: XCTestCase {
             func function(value: Int) -> Void
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                func function(value: Int) -> Void
+            }
 
             #if DEBUG
 
@@ -548,9 +592,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
 
     func testGenerateMock_HappyPath_NonVoidFunction_WithAnonParam() {
@@ -559,14 +602,16 @@ final class GenerateMockMacroTests: XCTestCase {
             func function(_ value: Int) -> Bool
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                func function(_ value: Int) -> Bool
+            }
 
             #if DEBUG
 
@@ -583,9 +628,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_NonVoidFunction_WithInternalAndExternalParams() {
         let proto = """
@@ -593,14 +637,16 @@ final class GenerateMockMacroTests: XCTestCase {
             func function(with value: Int) -> Bool
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                func function(with value: Int) -> Bool
+            }
 
             #if DEBUG
 
@@ -617,9 +663,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
 
     func testGenerateMock_HappyPath_ClosureFunction_WithAnonParam() {
@@ -628,14 +673,16 @@ final class GenerateMockMacroTests: XCTestCase {
             func function(_ value: Int) -> () -> Void
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                func function(_ value: Int) -> () -> Void
+            }
 
             #if DEBUG
 
@@ -652,9 +699,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_ClosureFunctionWithParam_WithAnonParam() {
         let proto = """
@@ -662,14 +708,16 @@ final class GenerateMockMacroTests: XCTestCase {
             func function(_ value: Int) -> (Bool) -> Void
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                func function(_ value: Int) -> (Bool) -> Void
+            }
 
             #if DEBUG
 
@@ -686,9 +734,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
 
     func testGenerateMock_HappyPath_ThrowingFunction() {
@@ -697,14 +744,16 @@ final class GenerateMockMacroTests: XCTestCase {
             func function() throws
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                func function() throws
+            }
 
             #if DEBUG
 
@@ -721,9 +770,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_AsyncFunction() {
         let proto = """
@@ -731,14 +779,16 @@ final class GenerateMockMacroTests: XCTestCase {
             func function() async
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                func function() async
+            }
 
             #if DEBUG
 
@@ -755,9 +805,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_AsyncThrowingFunction() {
         let proto = """
@@ -765,14 +814,16 @@ final class GenerateMockMacroTests: XCTestCase {
             func function() async throws
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                func function() async throws
+            }
 
             #if DEBUG
 
@@ -789,9 +840,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_AsyncThrowingFunctionWithBothParamsAndReturnType() {
         let proto = """
@@ -799,14 +849,16 @@ final class GenerateMockMacroTests: XCTestCase {
             func function(with value: Bool) async throws -> String
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                func function(with value: Bool) async throws -> String
+            }
 
             #if DEBUG
 
@@ -823,9 +875,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
 
     func testGenerateMock_HappyPath_FunctionWithParamsWithAttributes() {
@@ -834,14 +885,16 @@ final class GenerateMockMacroTests: XCTestCase {
             func function(_ closure: @Sendable @escaping (Bool) -> Void) async throws -> String
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                func function(_ closure: @Sendable @escaping (Bool) -> Void) async throws -> String
+            }
 
             #if DEBUG
 
@@ -858,9 +911,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
 
     func testGenerateMock_HappyPath_AssociatedType() {
@@ -873,14 +925,20 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                associatedtype Value
 
-            \(proto)
+                var property: Value {
+                    get
+                }
+            }
 
             #if DEBUG
 
@@ -902,9 +960,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_AssociatedTypeWithConstraint() {
         let proto = """
@@ -916,14 +973,20 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                associatedtype Value: Codable
 
-            \(proto)
+                var property: Value {
+                    get
+                }
+            }
 
             #if DEBUG
 
@@ -945,9 +1008,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_MultipleAssociatedTypes() {
         let proto = """
@@ -956,14 +1018,17 @@ final class GenerateMockMacroTests: XCTestCase {
             associatedtype Bar: Codable
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                associatedtype Foo
+                associatedtype Bar: Codable
+            }
 
             #if DEBUG
 
@@ -976,9 +1041,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
 
     func testGenerateMock_HappyPath_Inheritance() {
@@ -989,14 +1053,18 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol: Equatable {
+                var property: String {
+                    get
+                }
+            }
 
             #if DEBUG
 
@@ -1018,9 +1086,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
     func testGenerateMock_HappyPath_MultipleInheritance() {
         let proto = """
@@ -1030,14 +1097,18 @@ final class GenerateMockMacroTests: XCTestCase {
             }
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol: Equatable, Codable {
+                var property: String {
+                    get
+                }
+            }
 
             #if DEBUG
 
@@ -1059,9 +1130,8 @@ final class GenerateMockMacroTests: XCTestCase {
             }
 
             #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
 
     func _testGenerateMock_HappyPath_OverloadedFunctions() {
@@ -1071,24 +1141,11 @@ final class GenerateMockMacroTests: XCTestCase {
             func function() -> Int
         }
         """
-        assertMacroExpansion(
+        assertMacro {
             """
             @GenerateMock
             \(proto)
-            """,
-            expandedSource: """
-
-            \(proto)
-
-            #if DEBUG
-
-            open class TestProtocolMock: TestProtocol {
-                // TODO
-            }
-
-            #endif
-            """,
-            macros: testMacros
-        )
+            """
+        }
     }
 }
