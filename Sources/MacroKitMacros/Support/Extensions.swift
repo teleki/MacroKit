@@ -34,6 +34,9 @@ extension FunctionDeclSyntax {
     public var isAsync: Bool {
         return signature.effectSpecifiers?.asyncSpecifier != nil
     }
+    public var isStatic: Bool {
+        return modifiers.lazy.contains(where: { $0.name.tokenKind == .keyword(.static) }) == true
+    }
 }
 
 extension FunctionParameterListSyntax {

@@ -18,32 +18,30 @@ public struct GenerateMockMacro: PeerMacro {
     ) throws -> [DeclSyntax] {
         guard let protoDecl = declaration.as(ProtocolDeclSyntax.self) else { throw Error.notAProtocol }
 
-
         // Instance properties
         let mockMemberProperties = protoDecl.properties
-            .map { DeclSyntax("public var \(raw: $0.identifier.text): MockMember<\(raw: $0.type!.type.trimmed), \(raw: $0.returnType)> = .init()") }
+            .map { DeclSyntax("\(raw: protoDecl.declAccessLevel == .public ? "public" : "internal") var \(raw: $0.identifier.text): MockMember<\(raw: $0.type!.type.trimmed), \(raw: $0.returnType)> = .init()") }
             .compactMap { MemberBlockItemSyntax(decl: $0) }
 
         let properties = protoDecl.properties
-            .map(\.mockProperty)
+            .map { $0.makeMockProperty(accessLevel: protoDecl.declAccessLevel) }
             .compactMap { MemberBlockItemSyntax(decl: $0) }
 
         // Instance functions
         let mockMemberFunctions = protoDecl.functions
-            .map { DeclSyntax("public var \(raw: $0.name.text): MockMember<(\(raw: $0.parameters.typesWithoutAttribues.map(\.description).joined(separator: ", "))), \(raw: $0.returnTypeOrVoid)> = .init()") }
+            .map { DeclSyntax("\(raw: protoDecl.declAccessLevel == .public ? "public" : "internal") var \(raw: $0.name.text): MockMember<(\(raw: $0.parameters.typesWithoutAttribues.map(\.description).joined(separator: ", "))), \(raw: $0.returnTypeOrVoid)> = .init()") }
             .compactMap { MemberBlockItemSyntax(decl: $0) }
 
         let functions = protoDecl.functions
-            .map(\.mockFunction)
+            .map { $0.makeMockFunction(accessLevel: protoDecl.declAccessLevel) }
             .compactMap { MemberBlockItemSyntax(decl: $0) }
 
-
         // Consolidation
-        let mockMemberMembers: MemberBlockItemListSyntax = .init(mockMemberProperties + mockMemberFunctions)
+        let mockMemberMembers = MemberBlockItemListSyntax(mockMemberProperties + mockMemberFunctions)
 
         let mockMembers = ClassDeclSyntax(
             modifiers: DeclModifierListSyntax {
-                DeclModifierSyntax(name: "public")
+                DeclModifierSyntax(name: protoDecl.declAccessLevel == .public ? "public" : "internal")
             },
             name: "Members",
             memberBlock: MemberBlockSyntax(members: mockMemberMembers)
@@ -61,11 +59,11 @@ public struct GenerateMockMacro: PeerMacro {
 
         let cls = try ClassDeclSyntax(
             modifiers: DeclModifierListSyntax {
-                DeclModifierSyntax(name: "open")
+                DeclModifierSyntax(name: protoDecl.declAccessLevel == .public ? "open" : "internal")
             },
             name: "\(raw: protoDecl.name.text)Mock",
             genericParameterClause: genericParams,
-            inheritanceClause: InheritanceClauseSyntax.init {
+            inheritanceClause: InheritanceClauseSyntax {
                 InheritedTypeSyntax(type: TypeSyntax("\(raw: protoDecl.name.text)"))
                 if let inheritance = protoDecl.inheritanceClause?.inheritedTypes {
                     inheritance
@@ -73,12 +71,12 @@ public struct GenerateMockMacro: PeerMacro {
             },
             genericWhereClause: nil,
             memberBlockBuilder: {
-                DeclSyntax("public let mocks = Members()")
+                DeclSyntax("\(raw: protoDecl.declAccessLevel == .public ? "public" : "internal") let mocks = Members()")
 
                 mockMembers
 
                 let initializers = protoDecl.initializers
-                if initializers.isEmpty {
+                if initializers.isEmpty, protoDecl.declAccessLevel == .public {
                     DeclSyntax("public init() {}")
                 }
                 for initializer in initializers {
@@ -103,7 +101,7 @@ public struct GenerateMockMacro: PeerMacro {
 
 private extension VariableDeclSyntax {
     /// Take a `VariableDeclSyntax` from the source protocol and add `AccessorDeclSyntax`s for the getter and, if needed, setter
-    var mockProperty: VariableDeclSyntax {
+    func makeMockProperty(accessLevel: AccessLevelModifier) -> VariableDeclSyntax {
         var newProperty = trimmed
         var binding = newProperty.bindings.first!
         let accessor = binding.accessorBlock!
@@ -123,7 +121,7 @@ private extension VariableDeclSyntax {
             accessors = accessors.trimmed
 
             binding.accessorBlock = .init(accessors: .accessors(accessors))
-            newProperty.accessLevel = .open
+            newProperty.accessLevel = accessLevel == .public ? .open : .internal
 
             newProperty.bindings = .init { binding }
             return newProperty.trimmed
@@ -139,7 +137,7 @@ private extension VariableDeclSyntax {
 }
 
 private extension FunctionDeclSyntax {
-    var mockFunction: FunctionDeclSyntax {
+    func makeMockFunction(accessLevel: AccessLevelModifier) -> FunctionDeclSyntax {
         var newFunction = trimmed
 
         var newSignature = signature
@@ -151,9 +149,10 @@ private extension FunctionDeclSyntax {
             params.append("arg\(x)")
         }
 
+        let publicAccess: AccessLevelModifier = isStatic ? .public : .open
+        newFunction.accessLevel = accessLevel == .public ? publicAccess : .internal
         newFunction.signature = newSignature
-        newFunction.accessLevel = .open
-        newFunction.body = CodeBlockSyntax.init(statementsBuilder: {
+        newFunction.body = CodeBlockSyntax(statementsBuilder: {
             CodeBlockItemSyntax(item: .stmt("return \(raw: isThrowing ? "try " : "")mocks.\(raw: name.text).execute((\(raw: params.joined(separator: ", "))))"))
         })
         return newFunction

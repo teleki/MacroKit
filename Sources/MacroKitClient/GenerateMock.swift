@@ -25,3 +25,12 @@ protocol DependencyC {
 
     func convert(_ input: Input) async throws -> Output
 }
+
+// Internal Types
+
+struct Qux { } // non-public
+
+@GenerateMock
+protocol DependencyD {
+    var qux: Qux { get }
+}

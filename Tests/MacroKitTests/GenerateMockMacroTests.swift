@@ -1148,4 +1148,110 @@ class GenerateMockMacroTests: XCTestCase {
             """
         }
     }
+
+    func testGenerateMock_whenInternalProtocol_allMockPropertiesAndFunctionsAreMadeInternal() {
+        let proto = """
+        protocol TestProtocol {
+            var property: String { get set }
+            func doWork() -> Int
+            static func doMoreWork() -> String
+        }
+        """
+
+        assertMacro {
+            """
+            @GenerateMock
+            \(proto)
+            """
+        } expansion: {
+            """
+            protocol TestProtocol {
+                var property: String { get set }
+                func doWork() -> Int
+                static func doMoreWork() -> String
+            }
+
+            #if DEBUG
+
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<String, String> = .init()
+                    internal var doWork: MockMember<(), Int> = .init()
+                    internal var doMoreWork: MockMember<(), String> = .init()
+                }
+                internal var property: String {
+                    get  {
+                        mocks.property.getter()
+                    }
+                    set {
+                        mocks.property.setter(newValue)
+                    }
+                }
+                internal func doWork() -> Int {
+                    return mocks.doWork.execute(())
+                }
+                static internal func doMoreWork() -> String {
+                    return mocks.doMoreWork.execute(())
+                }
+            }
+
+            #endif
+            """
+        }
+    }
+
+    func testGenerateMock_whenPublicProtocol_allMockPropertiesAndFunctionsAreMadePublic() {
+        let proto = """
+        public protocol TestProtocol {
+            var property: String { get set }
+            func doWork() -> Int
+            static func doMoreWork() -> String
+        }
+        """
+
+        assertMacro {
+            """
+            @GenerateMock
+            \(proto)
+            """
+        } expansion: {
+            """
+            public protocol TestProtocol {
+                var property: String { get set }
+                func doWork() -> Int
+                static func doMoreWork() -> String
+            }
+
+            #if DEBUG
+
+            open class TestProtocolMock: TestProtocol {
+                public let mocks = Members()
+                public class Members {
+                    public var property: MockMember<String, String> = .init()
+                    public var doWork: MockMember<(), Int> = .init()
+                    public var doMoreWork: MockMember<(), String> = .init()
+                }
+                public init() {
+                }
+                open var property: String {
+                    get  {
+                        mocks.property.getter()
+                    }
+                    set {
+                        mocks.property.setter(newValue)
+                    }
+                }
+                open func doWork() -> Int {
+                    return mocks.doWork.execute(())
+                }
+                static public func doMoreWork() -> String {
+                    return mocks.doMoreWork.execute(())
+                }
+            }
+
+            #endif
+            """
+        }
+    }
 }
