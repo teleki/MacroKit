@@ -4,17 +4,13 @@ import SwiftSyntaxMacros
 import SwiftSyntaxMacrosTestSupport
 import XCTest
 
-private let testMacros: [String: Macro.Type] = [
-    "GenerateMock": GenerateMockMacro.self,
-]
-
 // edges cases:
 //  - overloaded functions
 
 class GenerateMockMacroTests: XCTestCase {
 
     override func invokeTest() {
-        withMacroTesting(macros: [GenerateMockMacro.self]) {
+        withMacroTesting(record: false, macros: [GenerateMockMacro.self]) {
             super.invokeTest()
         }
     }
@@ -42,14 +38,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<String, String> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<String, String> = .init()
                 }
-                public init() {
-                }
-                open var property: String {
+                internal var property: String {
                     get {
                         mocks.property.getter()
                     }
@@ -86,14 +80,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<String, Result<String, Error>> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<String, Result<String, Error>> = .init()
                 }
-                public init() {
-                }
-                open var property: String {
+                internal var property: String {
                     get throws {
                         try mocks.property.getter()
                     }
@@ -127,14 +119,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<String, String> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<String, String> = .init()
                 }
-                public init() {
-                }
-                open var property: String {
+                internal var property: String {
                     get async {
                         mocks.property.getter()
                     }
@@ -168,14 +158,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<String, Result<String, Error>> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<String, Result<String, Error>> = .init()
                 }
-                public init() {
-                }
-                open var property: String {
+                internal var property: String {
                     get async throws {
                         try mocks.property.getter()
                     }
@@ -211,14 +199,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<String, String> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<String, String> = .init()
                 }
-                public init() {
-                }
-                open var property: String {
+                internal var property: String {
                     get {
                         mocks.property.getter()
                     }
@@ -256,14 +242,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<() -> Void, () -> Void> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<() -> Void, () -> Void> = .init()
                 }
-                public init() {
-                }
-                open var property: () -> Void {
+                internal var property: () -> Void {
                     get {
                         mocks.property.getter()
                     }
@@ -300,14 +284,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<(Int) -> Void, (Int) -> Void> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<(Int) -> Void, (Int) -> Void> = .init()
                 }
-                public init() {
-                }
-                open var property: (Int) -> Void {
+                internal var property: (Int) -> Void {
                     get {
                         mocks.property.getter()
                     }
@@ -344,14 +326,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<(Int, Bool) -> Void, (Int, Bool) -> Void> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<(Int, Bool) -> Void, (Int, Bool) -> Void> = .init()
                 }
-                public init() {
-                }
-                open var property: (Int, Bool) -> Void {
+                internal var property: (Int, Bool) -> Void {
                     get {
                         mocks.property.getter()
                     }
@@ -389,14 +369,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<(Int, Bool) throws -> Void, (Int, Bool) throws -> Void> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<(Int, Bool) throws -> Void, (Int, Bool) throws -> Void> = .init()
                 }
-                public init() {
-                }
-                open var property: (Int, Bool) throws -> Void {
+                internal var property: (Int, Bool) throws -> Void {
                     get {
                         mocks.property.getter()
                     }
@@ -433,14 +411,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<(Int, Bool) async throws -> Void, (Int, Bool) async throws -> Void> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<(Int, Bool) async throws -> Void, (Int, Bool) async throws -> Void> = .init()
                 }
-                public init() {
-                }
-                open var property: (Int, Bool) async throws -> Void {
+                internal var property: (Int, Bool) async throws -> Void {
                     get {
                         mocks.property.getter()
                     }
@@ -474,14 +450,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var function: MockMember<(), Void> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var function: MockMember<(), Void> = .init()
                 }
-                public init() {
-                }
-                open func function() {
+                internal func function() {
                     return mocks.function.execute(())
                 }
             }
@@ -509,14 +483,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var function: MockMember<(), Void> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var function: MockMember<(), Void> = .init()
                 }
-                public init() {
-                }
-                open func function() -> Void {
+                internal func function() -> Void {
                     return mocks.function.execute(())
                 }
             }
@@ -544,14 +516,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var function: MockMember<(Int), Void> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var function: MockMember<(Int), Void> = .init()
                 }
-                public init() {
-                }
-                open func function(value arg0: Int) {
+                internal func function(value arg0: Int) {
                     return mocks.function.execute((arg0))
                 }
             }
@@ -579,14 +549,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var function: MockMember<(Int), Void> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var function: MockMember<(Int), Void> = .init()
                 }
-                public init() {
-                }
-                open func function(value arg0: Int) -> Void {
+                internal func function(value arg0: Int) -> Void {
                     return mocks.function.execute((arg0))
                 }
             }
@@ -615,14 +583,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var function: MockMember<(Int), Bool> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var function: MockMember<(Int), Bool> = .init()
                 }
-                public init() {
-                }
-                open func function(_ arg0: Int) -> Bool {
+                internal func function(_ arg0: Int) -> Bool {
                     return mocks.function.execute((arg0))
                 }
             }
@@ -650,14 +616,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var function: MockMember<(Int), Bool> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var function: MockMember<(Int), Bool> = .init()
                 }
-                public init() {
-                }
-                open func function(with arg0: Int) -> Bool {
+                internal func function(with arg0: Int) -> Bool {
                     return mocks.function.execute((arg0))
                 }
             }
@@ -686,14 +650,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var function: MockMember<(Int), () -> Void> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var function: MockMember<(Int), () -> Void> = .init()
                 }
-                public init() {
-                }
-                open func function(_ arg0: Int) -> () -> Void {
+                internal func function(_ arg0: Int) -> () -> Void {
                     return mocks.function.execute((arg0))
                 }
             }
@@ -721,14 +683,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var function: MockMember<(Int), (Bool) -> Void> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var function: MockMember<(Int), (Bool) -> Void> = .init()
                 }
-                public init() {
-                }
-                open func function(_ arg0: Int) -> (Bool) -> Void {
+                internal func function(_ arg0: Int) -> (Bool) -> Void {
                     return mocks.function.execute((arg0))
                 }
             }
@@ -757,14 +717,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var function: MockMember<(), Result<Void, Error>> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var function: MockMember<(), Result<Void, Error>> = .init()
                 }
-                public init() {
-                }
-                open func function() throws {
+                internal func function() throws {
                     return try mocks.function.execute(())
                 }
             }
@@ -792,14 +750,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var function: MockMember<(), Void> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var function: MockMember<(), Void> = .init()
                 }
-                public init() {
-                }
-                open func function() async {
+                internal func function() async {
                     return mocks.function.execute(())
                 }
             }
@@ -827,14 +783,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var function: MockMember<(), Result<Void, Error>> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var function: MockMember<(), Result<Void, Error>> = .init()
                 }
-                public init() {
-                }
-                open func function() async throws {
+                internal func function() async throws {
                     return try mocks.function.execute(())
                 }
             }
@@ -862,14 +816,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var function: MockMember<(Bool), Result<String, Error>> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var function: MockMember<(Bool), Result<String, Error>> = .init()
                 }
-                public init() {
-                }
-                open func function(with arg0: Bool) async throws -> String {
+                internal func function(with arg0: Bool) async throws -> String {
                     return try mocks.function.execute((arg0))
                 }
             }
@@ -898,14 +850,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var function: MockMember<((Bool) -> Void), Result<String, Error>> = .init()
+            internal class TestProtocolMock: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var function: MockMember<((Bool) -> Void), Result<String, Error>> = .init()
                 }
-                public init() {
-                }
-                open func function(_ arg0: @Sendable @escaping (Bool) -> Void) async throws -> String {
+                internal func function(_ arg0: @Sendable @escaping (Bool) -> Void) async throws -> String {
                     return try mocks.function.execute((arg0))
                 }
             }
@@ -942,14 +892,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock<Value>: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<Value, Value> = .init()
+            internal class TestProtocolMock<Value>: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<Value, Value> = .init()
                 }
-                public init() {
-                }
-                open var property: Value {
+                internal var property: Value {
                     get {
                         mocks.property.getter()
                     }
@@ -990,14 +938,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock<Value: Codable>: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<Value, Value> = .init()
+            internal class TestProtocolMock<Value: Codable>: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<Value, Value> = .init()
                 }
-                public init() {
-                }
-                open var property: Value {
+                internal var property: Value {
                     get {
                         mocks.property.getter()
                     }
@@ -1032,11 +978,9 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock<Foo, Bar: Codable>: TestProtocol {
-                public let mocks = Members()
-                public class Members {
-                }
-                public init() {
+            internal class TestProtocolMock<Foo, Bar: Codable>: TestProtocol {
+                internal let mocks = Members()
+                internal class Members {
                 }
             }
 
@@ -1068,14 +1012,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol, Equatable {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<String, String> = .init()
+            internal class TestProtocolMock: TestProtocol, Equatable {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<String, String> = .init()
                 }
-                public init() {
-                }
-                open var property: String {
+                internal var property: String {
                     get {
                         mocks.property.getter()
                     }
@@ -1112,14 +1054,12 @@ class GenerateMockMacroTests: XCTestCase {
 
             #if DEBUG
 
-            open class TestProtocolMock: TestProtocol, Equatable, Codable {
-                public let mocks = Members()
-                public class Members {
-                    public var property: MockMember<String, String> = .init()
+            internal class TestProtocolMock: TestProtocol, Equatable, Codable {
+                internal let mocks = Members()
+                internal class Members {
+                    internal var property: MockMember<String, String> = .init()
                 }
-                public init() {
-                }
-                open var property: String {
+                internal var property: String {
                     get {
                         mocks.property.getter()
                     }
