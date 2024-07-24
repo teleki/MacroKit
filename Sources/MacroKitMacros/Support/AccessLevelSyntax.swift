@@ -42,6 +42,7 @@ extension StructDeclSyntax: AccessLevelSyntax { }
 extension ClassDeclSyntax: AccessLevelSyntax { }
 extension EnumDeclSyntax: AccessLevelSyntax { }
 extension ActorDeclSyntax: AccessLevelSyntax { }
+extension ProtocolDeclSyntax: AccessLevelSyntax { }
 
 extension FunctionDeclSyntax: AccessLevelSyntax { }
 extension VariableDeclSyntax: AccessLevelSyntax { }
